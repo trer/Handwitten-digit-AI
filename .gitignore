@@ -1,6 +1,5 @@
 .idea
 pyvenv.cfg
-data/
 test.py
 
 
