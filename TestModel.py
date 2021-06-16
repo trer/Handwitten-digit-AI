@@ -1,25 +1,21 @@
+import time
 from tensorflow import keras
 from FetchData import FetchData
 from models import FlattSequentialNet, SimpleConv2D
 import numpy as np
-import time
 import matplotlib.pyplot as plt
-
-dataFetcher = FetchData()
-X = np.array(dataFetcher.get_traningset())
-y = np.array(dataFetcher.get_traninglabels())
-testX = np.array(dataFetcher.get_testset())
-testy = np.array(dataFetcher.get_testlabels())
 
 
 def test_model(model, training_set, training_labels, test_set, test_labels):
+    """ Tests the model on a labeled dataset split into training- and test-set.
+    Returns accuracy of the model and different time measurements. """
     training_set = model.resize(training_set)
     test_set = model.resize(test_set)
 
     model = model.model
     t0 = time.time()
-    model.compile(loss=keras.losses.SparseCategoricalCrossentropy(from_logits=True), optimizer='adam',
-                  metrics=['accuracy'])
+    model.compile(loss=keras.losses.SparseCategoricalCrossentropy(
+        from_logits=True), optimizer='adam', metrics=['accuracy'])
     t1 = time.time()
 
     model.fit(training_set, training_labels, epochs=1, batch_size=10)
@@ -32,31 +28,39 @@ def test_model(model, training_set, training_labels, test_set, test_labels):
     training_time = t2 - t1
     prediction_time = t3 - t2
     print(
-        f"accuracy: {accuracy}, compiletime: {compile_time}, trainingTime: {training_time}, predictionTime: {prediction_time}")
+        f"accuracy: {accuracy}, compiletime: {compile_time}, trainingTime:"
+        f" {training_time}, predictionTime: {prediction_time}")
     return [accuracy, compile_time, training_time, prediction_time]
 
 
-def plot(results, titles = ('accuracy', 'compile_time', 'training_time', 'prediction_time'),
-    labels = ('FlattSequential', 'SimpleConv2d')):
-    """ ayaya """
+def plot(
+    data_to_plot,
+    titles=(
+        'accuracy',
+        'compile_time',
+        'training_time',
+        'prediction_time'),
+        labels=(
+            'FlattSequential',
+        'SimpleConv2d')):
+    """ Takes in results from benchmarking, benchmarking titles and models tested.
+    Plots it to the screen using PyPlot. """
     # create plot
     fig, ((ax0, ax1), (ax2, ax3)) = plt.subplots(nrows=2, ncols=2)
-    axis = [ax0, ax1, ax2, ax3]
     bar_width = 0.35
     opacity = 0.8
 
-    #Data
+    # Add data to separate lists so it can be compared against each other.
     accuracy = []
     compile_time = []
     training_time = []
     prediction_time = []
 
-    for result in results:
+    for result in data_to_plot:
         accuracy.append(result[0])
         compile_time.append(result[1])
         training_time.append(result[2])
         prediction_time.append(result[3])
-
 
     ax0.bar(labels, accuracy, bar_width,
             alpha=opacity)
@@ -78,25 +82,24 @@ def plot(results, titles = ('accuracy', 'compile_time', 'training_time', 'predic
     plt.show()
 
 
-models = []
-model2 = SimpleConv2D.SimpleConv2D()
-models.append(model2)
-model1 = FlattSequentialNet.FlattSequentialModel()
-models.append(model1)
-names = [model.name for model in models]
+if __name__ == '__main__':
 
-results = []
-for model in models:
-    results.append(test_model(model, X, y, testX, testy))
+    # Add all models to a list
+    models = [SimpleConv2D.SimpleConv2D(),
+              FlattSequentialNet.FlattSequentialModel()]
+    names = [model.name for model in models]
 
-plot(results, labels=names)
+    # Acquire test data.
+    dataFetcher = FetchData()
+    X = np.array(dataFetcher.get_training_set())
+    y = np.array(dataFetcher.get_training_labels())
+    testX = np.array(dataFetcher.get_test_set())
+    testy = np.array(dataFetcher.get_test_labels())
 
-"""
-model = SimpleConv2D.SimpleConv2D()
-print(X.shape)
-X = model.resize(X)
-print(X.shape)
-testX = model.resize(testX)
+    # For each model check accuracy and different time measurements
+    results = []
+    for m in models:
+        results.append(test_model(m, X, y, testX, testy))
 
-test_model(model, X, y, testX, testy)
-"""
+    # Plot in a nice graph
+    plot(results, labels=names)
