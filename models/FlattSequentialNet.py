@@ -1,8 +1,10 @@
 from keras.models import Sequential
 from keras.layers import Dense, Flatten
+from DefaultModel import DefaultModel
 
 
-class FlattSequentialModel:
+class FlattSequentialModel(DefaultModel):
+    """ Simple Flatt sequential net. """
 
     def __init__(self):
         self.name = 'FlattSequentialModel'
@@ -10,6 +12,3 @@ class FlattSequentialModel:
         self.model.add(Flatten(input_shape=(28, 28)))
         self.model.add(Dense(128, activation='relu'))
         self.model.add(Dense(10))
-
-    def resize(self, data):
-        return data

@@ -3,6 +3,7 @@ from mnist import *
 import torchvision.datasets as datasets
 
 class FetchData:
+    """ class for getting the dataset loaded from files. """
     def __init__(self):
         pass
 
