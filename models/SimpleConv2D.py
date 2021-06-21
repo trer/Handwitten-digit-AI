@@ -1,9 +1,9 @@
 from keras.layers import Dense, Conv2D, Flatten
 from keras.models import Sequential
-from DefaultModel import DefaultModel
+from . import DefaultModel
 
 
-class SimpleConv2D(DefaultModel):
+class SimpleConv2D(DefaultModel.DefaultModel):
     """ A Conv2D network"""
 
     def __init__(self):

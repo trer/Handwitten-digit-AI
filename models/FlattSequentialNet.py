@@ -1,9 +1,9 @@
 from keras.models import Sequential
 from keras.layers import Dense, Flatten
-from DefaultModel import DefaultModel
+from . import DefaultModel
 
 
-class FlattSequentialModel(DefaultModel):
+class FlattSequentialModel(DefaultModel.DefaultModel):
     """ Simple Flatt sequential net. """
 
     def __init__(self):

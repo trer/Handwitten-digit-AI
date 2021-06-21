@@ -1,6 +1,7 @@
 .idea
 pyvenv.cfg
 test.py
+*.h5
 
 
 # Byte-compiled / optimized / DLL files

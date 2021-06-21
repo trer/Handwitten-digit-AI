@@ -1,6 +1,6 @@
 
 
-class DefaultModel():
+class DefaultModel:
     """ Model parent"""
 
     def resize(self, data):

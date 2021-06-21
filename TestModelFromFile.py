@@ -1,5 +1,6 @@
 import time
-from tensorflow import keras
+
+from keras.models import load_model
 from FetchData import FetchData
 from models import DefaultModel
 from models import FlattSequentialNet, SimpleConv2D
@@ -7,42 +8,30 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
-def test_model(model, training_set, training_labels, test_set, test_labels):
+def test_model(model, test_set, test_labels):
     """ Tests the model on a labeled dataset split into training- and test-set.
     Returns accuracy of the model and different time measurements. """
-    training_set = model.resize(training_set)
     test_set = model.resize(test_set)
 
-    model1 = model.model
+    # load model
+    model1 = load_model(f'{model.name}.h5')
+    # summarize model.
+    model1.summary()
     t0 = time.time()
-    # keras.losses.SparseCategoricalCrossentropy(
-    #         from_logits=True)
-    model1.compile(loss=keras.losses.SparseCategoricalCrossentropy(
-        from_logits=True), optimizer='adam', metrics=['accuracy'])
-    t1 = time.time()
-
-    model1.fit(training_set, training_labels, epochs=1, batch_size=10)
-    t2 = time.time()
 
     _, accuracy = model1.evaluate(test_set, test_labels)
-    t3 = time.time()
+    t1 = time.time()
     model1.save(f"{model.name}.h5")
-
-    compile_time = t1 - t0
-    training_time = t2 - t1
-    prediction_time = t3 - t2
+    prediction_time = t1 - t0
     print(
-        f"accuracy: {accuracy}, compiletime: {compile_time}, trainingTime:"
-        f" {training_time}, predictionTime: {prediction_time}")
-    return [accuracy, compile_time, training_time, prediction_time]
+        f"accuracy: {accuracy}, predictionTime: {prediction_time}")
+    return [accuracy, prediction_time]
 
 
 def plot(
     data_to_plot,
     titles=(
         'accuracy',
-        'compile_time',
-        'training_time',
         'prediction_time'),
         labels=(
             'FlattSequential',
@@ -56,31 +45,19 @@ def plot(
 
     # Add data to separate lists so it can be compared against each other.
     accuracy = []
-    compile_time = []
-    training_time = []
     prediction_time = []
 
     for result in data_to_plot:
         accuracy.append(result[0])
-        compile_time.append(result[1])
-        training_time.append(result[2])
-        prediction_time.append(result[3])
+        prediction_time.append(result[1])
 
     ax0.bar(labels, accuracy, bar_width,
             alpha=opacity)
     ax0.set_title(titles[0])
 
-    ax1.bar(labels, compile_time, bar_width,
-            alpha=opacity)
-    ax1.set_title(titles[1])
-
-    ax2.bar(labels, training_time, bar_width,
-            alpha=opacity)
-    ax2.set_title(titles[2])
-
     ax3.bar(labels, prediction_time, bar_width,
             alpha=opacity)
-    ax3.set_title(titles[3])
+    ax3.set_title(titles[1])
 
     fig.tight_layout()
     plt.show()
@@ -104,7 +81,7 @@ if __name__ == '__main__':
     # For each model check accuracy and different time measurements
     results = []
     for m in models:
-        results.append(test_model(m, X, y, testX, testy))
+        results.append(test_model(m, testX, testy))
 
     # Plot in a nice graph
     plot(results, labels=names)
