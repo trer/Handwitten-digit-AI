@@ -11,17 +11,18 @@ def test_model(model, training_set, training_labels, test_set, test_labels):
     """ Tests the model on a labeled dataset split into training- and test-set.
     Returns accuracy of the model and different time measurements. """
     training_set = model.resize(training_set)
+    training_labels = model.label_resize(training_labels)
     test_set = model.resize(test_set)
+    test_labels = model.label_resize(test_labels)
 
     model1 = model.model
     t0 = time.time()
     # keras.losses.SparseCategoricalCrossentropy(
     #         from_logits=True)
-    model1.compile(loss=keras.losses.SparseCategoricalCrossentropy(
-        from_logits=True), optimizer='adam', metrics=['accuracy'])
+    model1.compile(loss=model.loss, optimizer=model.optimizer, metrics=model.metrics)
     t1 = time.time()
 
-    model1.fit(training_set, training_labels, epochs=1, batch_size=10)
+    model1.fit(training_set, training_labels, epochs=1)
     t2 = time.time()
 
     _, accuracy = model1.evaluate(test_set, test_labels)
