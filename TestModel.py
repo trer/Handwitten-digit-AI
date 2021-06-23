@@ -1,4 +1,7 @@
+import random
 import time
+
+from scipy.ndimage import rotate
 from tensorflow import keras
 from FetchData import FetchData
 from models import DefaultModel
@@ -98,6 +101,11 @@ if __name__ == '__main__':
     # Acquire test data.
     dataFetcher = FetchData()
     X = np.array(dataFetcher.get_training_set())
+    #X = rotate(X, random.randint(0, 359), axes=(2, 1), reshape=False)
+    #fig, axs = plt.subplots(2, 5)
+    #for i in range(10):
+    #    axs[i // 5, i % 5].imshow(X[i])
+    #plt.show()
     y = np.array(dataFetcher.get_training_labels())
     testX = np.array(dataFetcher.get_test_set())
     testy = np.array(dataFetcher.get_test_labels())
